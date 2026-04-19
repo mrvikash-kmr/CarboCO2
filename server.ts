@@ -5,7 +5,7 @@ import { scanRoutes } from "./src/server/routes/scanRoutes.js";
 
 async function startServer() {
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT: number = parseInt(process.env.PORT || "3000", 10);
 
   app.use(express.json());
 
