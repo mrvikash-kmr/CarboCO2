@@ -1,0 +1,64 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile data including preferences.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "User's display name" },
+        "email": { "type": "string", "description": "User's email address" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "darkMode": { "type": "boolean" },
+            "notificationsEnabled": { "type": "boolean" }
+          }
+        },
+        "createdAt": { "type": "number", "description": "Timestamp of creation" },
+        "updatedAt": { "type": "number", "description": "Timestamp of last update" }
+      },
+      "required": ["name", "email", "createdAt", "updatedAt"]
+    },
+    "Scan": {
+      "title": "Scan",
+      "description": "A carbon footprint scan for a specific URL.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The ID of the user who owns the scan" },
+        "url": { "type": "string" },
+        "co2": { "type": "number" },
+        "energy": { "type": "number" },
+        "page_size": { "type": "number" },
+        "load_time": { "type": "number" },
+        "requests": { "type": "number" },
+        "breakdown": {
+          "type": "object",
+          "properties": {
+            "html": { "type": "number" },
+            "css": { "type": "number" },
+            "js": { "type": "number" },
+            "image": { "type": "number" },
+            "font": { "type": "number" },
+            "other": { "type": "number" }
+          }
+        },
+        "recommendations": {
+          "type": "array"
+        },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["userId", "url", "co2", "energy", "page_size", "load_time", "requests", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Stores user profiles."
+    },
+    "/scans/{scanId}": {
+      "schema": { "$ref": "#/entities/Scan" },
+      "description": "Stores scan history."
+    }
+  }
+}

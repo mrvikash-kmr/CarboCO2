@@ -1,0 +1,98 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Phase 3: Primitives
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+
+    function isServerTimestamp(val) {
+      return val == request.time;
+    }
+
+    // Phase 4: Validators
+    function isValidUserCreate(data) {
+      return data.keys().hasAll(['name', 'email', 'createdAt', 'updatedAt', 'preferences'])
+        && data.keys().size() == 5
+        && data.name is string && data.name.size() <= 100 && data.name.size() > 0
+        && data.email is string && data.email.size() <= 200
+        && data.preferences is map
+        && data.preferences.keys().hasAll(['darkMode', 'notificationsEnabled'])
+        && data.preferences.darkMode is bool
+        && data.preferences.notificationsEnabled is bool
+        && isServerTimestamp(data.createdAt)
+        && isServerTimestamp(data.updatedAt);
+    } // Wait, what if someone registers with different keys? Let's use hasOnly later on update.
+
+    function isValidUserUpdate(diff) {
+      // User can update name, email, preferences, updatedAt
+      return diff.affectedKeys().hasOnly(['name', 'email', 'preferences', 'updatedAt'])
+        && incoming().updatedAt == request.time;
+    }
+
+    function checkUserProperties(data) {
+      return ((data.name is string && data.name.size() <= 100 && data.name.size() > 0) || !('name' in data.keys()))
+        && ((data.email is string && data.email.size() <= 200) || !('email' in data.keys()))
+        && ((data.preferences is map && data.preferences.keys().hasAll(['darkMode', 'notificationsEnabled']) && data.preferences.darkMode is bool && data.preferences.notificationsEnabled is bool) || !('preferences' in data.keys()));
+    }
+
+    function isValidScanCreate(data) {
+      return data.keys().hasAll(['userId', 'url', 'co2', 'energy', 'page_size', 'load_time', 'requests', 'breakdown', 'recommendations', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid
+        && data.url is string && data.url.size() <= 2048
+        && data.co2 is number && data.co2 >= 0
+        && data.energy is number && data.energy >= 0
+        && data.page_size is number && data.page_size >= 0
+        && data.load_time is number && data.load_time >= 0
+        && data.requests is number && data.requests >= 0
+        && data.breakdown is map
+        && data.recommendations is list && data.recommendations.size() <= 10
+        && (data.recommendations.size() == 0 || (data.recommendations[0] is map))
+        && isServerTimestamp(data.createdAt)
+        && isServerTimestamp(data.updatedAt);
+    }
+    
+    function isValidComparisonCreate(data) {
+      return data.keys().hasAll(['userId', 'url1', 'url2', 'site1', 'site2', 'createdAt', 'updatedAt'])
+        && data.userId is string && data.userId == request.auth.uid
+        && data.url1 is string && data.url1.size() <= 2048
+        && data.url2 is string && data.url2.size() <= 2048
+        && data.site1 is map
+        && data.site2 is map
+        && isServerTimestamp(data.createdAt)
+        && isServerTimestamp(data.updatedAt);
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserCreate(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserUpdate(incoming().diff(existing())) && checkUserProperties(incoming());
+    }
+
+    match /scans/{scanId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid && isValidId(scanId);
+      allow list: if isSignedIn() && existing().userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(scanId) && isValidScanCreate(incoming());
+      allow delete: if false; // Immutable
+      allow update: if false; // Immutable
+    }
+    
+    match /comparisons/{comparisonId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid && isValidId(comparisonId);
+      allow list: if isSignedIn() && existing().userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidId(comparisonId) && isValidComparisonCreate(incoming());
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+      allow update: if false; // Immutable
+    }
+  }
+}

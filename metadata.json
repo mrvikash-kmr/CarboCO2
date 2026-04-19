@@ -1,0 +1,5 @@
+{
+  "name": "Digital Carbon Footprint Anylazer",
+  "description": "Analyzes website URLs and estimates their carbon footprint based on performance data for ESG reporting.",
+  "requestFramePermissions": []
+}
