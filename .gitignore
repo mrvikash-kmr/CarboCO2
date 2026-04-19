@@ -5,8 +5,8 @@ coverage/
 .DS_Store
 *.log
 .env*
-.env.example
 .env.production
 .env.development
 .env.local
+.env.example
 .vscode/
