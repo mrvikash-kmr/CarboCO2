@@ -97,13 +97,20 @@ export default function SidebarLayout() {
           <div className="flex-1"></div>
           <div className="flex items-center space-x-4">
             <button 
+              type="button"
               onClick={toggleTheme}
               className="text-muted-foreground hover:text-foreground p-2 rounded-full hover:bg-muted transition-colors"
               title="Toggle Dark Mode"
+              aria-label="Toggle Dark Mode"
             >
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <button className="text-muted-foreground hover:text-foreground relative p-2 rounded-full hover:bg-muted transition-colors">
+            <button 
+              type="button"
+              title="Notifications"
+              aria-label="Notifications"
+              className="text-muted-foreground hover:text-foreground relative p-2 rounded-full hover:bg-muted transition-colors"
+            >
               <Bell className="h-5 w-5" />
               <span className="absolute top-2 right-2 h-2 w-2 bg-emerald-500 rounded-full border border-background"></span>
             </button>
