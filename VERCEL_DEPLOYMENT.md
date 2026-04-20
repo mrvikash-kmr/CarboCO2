@@ -46,13 +46,15 @@ Follow the prompts and select:
 
 5. **Add Environment Variables:**
    - Click "Environment Variables"
-   - Add these variables:
+   - Add these variables for all environments (Production, Preview, Development):
      ```
-     GEMINI_API_KEY = your_key
+     VITE_GEMINI_API_KEY = your_gemini_api_key
+     PAGESPEED_API_KEY = your_pagespeed_api_key
      MONGODB_URI = your_connection_string
      JWT_SECRET = your_secret_key
      NODE_ENV = production
      ```
+   - Make sure each variable is set before deploying
 
 6. **Deploy:**
    - Click "Deploy"
