@@ -14,10 +14,5 @@
       "destination": "/index.html"
     }
   ],
-  "regions": ["iad1"],
-  "functions": {
-    "src/server/routes/scanRoutes.ts": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  "regions": ["iad1"]
 }
