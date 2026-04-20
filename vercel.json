@@ -3,16 +3,5 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
-  "outputDirectory": "dist",
-  "rewrites": [
-    {
-      "source": "/api/:match*",
-      "destination": "/api/:match*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "regions": ["iad1"]
+  "outputDirectory": "dist"
 }

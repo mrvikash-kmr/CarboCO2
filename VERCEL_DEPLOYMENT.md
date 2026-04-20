@@ -21,6 +21,7 @@ vercel
 ```
 
 Follow the prompts and select:
+
 - **Project name**: carbon-footprint-analyzer
 - **Framework**: Vite
 - **Build command**: npm run build
@@ -29,7 +30,7 @@ Follow the prompts and select:
 ### Option 2: Deploy via GitHub (Recommended for Auto-Deploy)
 
 1. **Go to Vercel Dashboard:**
-   - https://vercel.com/dashboard
+   - [https://vercel.com/dashboard](https://vercel.com/dashboard)
 
 2. **Click "New Project"**
 
@@ -47,13 +48,15 @@ Follow the prompts and select:
 5. **Add Environment Variables:**
    - Click "Environment Variables"
    - Add these variables for all environments (Production, Preview, Development):
-     ```
-     VITE_GEMINI_API_KEY = your_gemini_api_key
-     PAGESPEED_API_KEY = your_pagespeed_api_key
-     MONGODB_URI = your_connection_string
-     JWT_SECRET = your_secret_key
-     NODE_ENV = production
-     ```
+
+   ```
+   VITE_GEMINI_API_KEY = your_gemini_api_key
+   PAGESPEED_API_KEY = your_pagespeed_api_key
+   MONGODB_URI = your_connection_string
+   JWT_SECRET = your_secret_key
+   NODE_ENV = production
+   ```
+
    - Make sure each variable is set before deploying
 
 6. **Deploy:**
@@ -83,6 +86,7 @@ Update in Vercel Dashboard:
 ### Auto-Deploy
 
 Every push to GitHub main branch automatically deploys:
+
 ```bash
 git add .
 git commit -m "Update: your changes"
@@ -105,8 +109,9 @@ vercel logs your-project-name --follow
 ## Environment Variables Reference
 
 | Variable | Required | Description |
-|----------|----------|-------------|
-| `GEMINI_API_KEY` | Yes | Google Gemini AI API key |
+| --- | --- | --- |
+| `VITE_GEMINI_API_KEY` | Yes | Google Gemini AI API key |
+| `PAGESPEED_API_KEY` | Yes | Google PageSpeed API key |
 | `MONGODB_URI` | Yes | MongoDB Atlas connection string |
 | `JWT_SECRET` | Yes | Secret key for JWT tokens (min 32 chars) |
 | `NODE_ENV` | Yes | Set to `production` |
@@ -175,4 +180,4 @@ vercel list
 
 ---
 
-**Vercel Documentation**: https://vercel.com/docs
+**Vercel Documentation**: [https://vercel.com/docs](https://vercel.com/docs)
