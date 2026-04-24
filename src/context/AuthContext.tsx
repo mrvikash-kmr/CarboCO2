@@ -1,5 +1,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged, User as FirebaseUser, signInWithPopup, signOut } from 'firebase/auth';
+import {
+  onAuthStateChanged,
+  User as FirebaseUser,
+  signInWithPopup,
+  signInWithRedirect,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signOut
+} from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, googleProvider, db } from '../lib/firebase';
 import axios from 'axios';
@@ -18,6 +27,8 @@ interface AuthContextType {
   user: UserProfile | null;
   firebaseUser: FirebaseUser | null;
   loginWithGoogle: () => Promise<void>;
+  loginWithEmail: (email: string, password: string) => Promise<void>;
+  signupWithEmail: (email: string, password: string, displayName?: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: UserProfile) => void;
   loading: boolean;
@@ -70,7 +81,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const loginWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error: any) {
+      const code = error?.code?.toString();
+      if (code === 'auth/popup-blocked' || code === 'auth/cancelled-popup-request') {
+        await signInWithRedirect(auth, googleProvider);
+      } else {
+        throw error;
+      }
+    }
+  };
+
+  const loginWithEmail = async (email: string, password: string) => {
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const signupWithEmail = async (email: string, password: string, displayName?: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    if (displayName) {
+      await updateProfile(userCredential.user, { displayName });
+    }
   };
 
   const logout = async () => {
@@ -82,7 +113,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, firebaseUser, loginWithGoogle, logout, updateUser, loading }}>
+    <AuthContext.Provider value={{
+      user,
+      firebaseUser,
+      loginWithGoogle,
+      loginWithEmail,
+      signupWithEmail,
+      logout,
+      updateUser,
+      loading
+    }}>
       {children}
     </AuthContext.Provider>
   );
